@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`generateMetadataPlugin > captures nested structure 1`] = `
+"{
+  "name": "@duplojs/dev-tools-integration",
+  "files": [
+    {
+      "name": "index.js"
+    },
+    {
+      "name": "nested",
+      "files": [
+        {
+          "name": "util.js"
+        },
+        {
+          "name": "deep",
+          "files": [
+            {
+              "name": "info.txt"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}"
+`;
