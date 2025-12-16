@@ -2,7 +2,7 @@
   "name": "integration",
   "type": "module",
   "scripts": {
-    "test:generate-metadata": "vitest --root .. run integration/generateMetadata/index.test.ts"
+    "build": "rollup --config"
   },
   "dependencies": {
     "@duplojs/dev-tools": "file:.."

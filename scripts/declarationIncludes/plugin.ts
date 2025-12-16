@@ -12,15 +12,17 @@ export class IncludesDeclarationError extends Error {
 	}
 }
 
-const includePattern = /\{@include (?<path>[A-z/.]+)(?:\[(?<startLine>[0-9]+),(?<endLine>[0-9]+)\])?\}/g;
+const includePattern = /^(?<indent>.*)\{@include (?<path>[A-z/.]+)(?:\[(?<startLine>[0-9]+),(?<endLine>[0-9]+)\])?\}/gm;
 
 interface DeclarationIncludesParams {
 	includedPath: string;
+	lineChar?: string;
 }
 
 export function declarationIncludesPlugin(
 	{
 		includedPath,
+		lineChar = "\n",
 	}: DeclarationIncludesParams,
 ) {
 	return {
@@ -41,9 +43,9 @@ export function declarationIncludesPlugin(
 							G.asyncReduce(
 								source,
 								async({ lastValue, element, next }) => {
-									const { path, startLine, endLine } = element.groups ?? {};
+									const { path, startLine, endLine, indent } = element.groups ?? {};
 
-									if (!path) {
+									if (!path || !indent) {
 										return next(lastValue);
 									}
 
@@ -51,7 +53,7 @@ export function declarationIncludesPlugin(
 
 									return pipe(
 										contentFile,
-										S.split("\n"),
+										S.split(lineChar),
 										(lines) => {
 											if (startLine && startLine) {
 												const start = Number(startLine) - 1;
@@ -62,7 +64,8 @@ export function declarationIncludesPlugin(
 
 											return lines;
 										},
-										A.join("\n\t* "),
+										A.map((value) => `${indent}${value}`),
+										A.join("\n"),
 										(content) => S.replace(
 											lastValue,
 											A.at(element, 0),

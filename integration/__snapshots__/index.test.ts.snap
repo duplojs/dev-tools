@@ -1,0 +1,41 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`build rollup 1`] = `
+"/**
+ * Super test de la mort qui tue.
+ * ------------
+ * \`\`\`js
+ * const grosToto = 1 * Infinity;
+ * \`\`\`
+ */
+export declare function mySuperFunction(superArg: string): string;
+"
+`;
+
+exports[`build rollup 2`] = `
+"{
+  "name": "@duplojs/test",
+  "files": [
+    {
+      "name": "mySuperDomain",
+      "files": [
+        {
+          "name": "mySuperFunction.mjs"
+        },
+        {
+          "name": "mySuperFunction.d.ts"
+        },
+        {
+          "name": "index.d.ts"
+        }
+      ]
+    },
+    {
+      "name": "index.d.ts"
+    },
+    {
+      "name": "index.mjs"
+    }
+  ]
+}"
+`;
