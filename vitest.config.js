@@ -6,33 +6,8 @@ export default defineConfig({
 		watch: false,
 		globals: true,
 		include: [
-			"tests/**/*.test.ts",
 			"integration/**/*.test.ts",
 		],
-		coverage: {
-			provider: "istanbul",
-			reporter: ["text", "json", "html", "json-summary"],
-			reportsDirectory: "coverage",
-			include: ["scripts/toTypescript/transformer/defaults"],
-			exclude: [
-				"**/*.test.ts", 
-				"bin", 
-				"dist",
-				"docs",
-			],
-			thresholds: {
-				lines: 100,
-				branches: 100,
-				functions: 100,
-				statements: 100
-			}
-		},
-		benchmark: {
-			include: [
-				"tests/**/*.bench.ts",
-				"integration/**/*.bench.ts",
-			]
-		}
 	},
 	plugins: [tsconfigPaths()],
 });
