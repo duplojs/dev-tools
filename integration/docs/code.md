@@ -1,5 +1,5 @@
 ### Ignored title
 
-```js
-const grosToto = 1 * Infinity;
+```ts
+{@include example.ts}
 ```

@@ -4,8 +4,9 @@ exports[`build rollup 1`] = `
 "/**
  * Super test de la mort qui tue.
  * ------------
- * \`\`\`js
- * const grosToto = 1 * Infinity;
+ * \`\`\`ts
+ * const hardCalc = 1 * 1000;
+ * 
  * \`\`\`
  */
 export declare function mySuperFunction(superArg: string): string;
@@ -20,13 +21,13 @@ exports[`build rollup 2`] = `
       "name": "mySuperDomain",
       "files": [
         {
-          "name": "mySuperFunction.mjs"
+          "name": "index.d.ts"
         },
         {
           "name": "mySuperFunction.d.ts"
         },
         {
-          "name": "index.d.ts"
+          "name": "mySuperFunction.mjs"
         }
       ]
     },

@@ -7,6 +7,16 @@ export interface FileStructure {
 	files?: FileStructure[];
 }
 
+const collator = new Intl.Collator(
+	"en-US-u-kn-true",
+	{
+		usage: "sort",
+		sensitivity: "variant",
+		numeric: false,
+		ignorePunctuation: false,
+	},
+);
+
 export function walkDirectory(
 	directoryPath: string,
 ): Promise<FileStructure[]> {
@@ -20,15 +30,35 @@ export function walkDirectory(
 						join(directoryPath, name),
 						walkDirectory,
 						(files) => ({
+							type: <const>"folder",
 							name,
 							files,
 						}),
 					),
 				),
-				P.otherwise(O.pick({ name: true })),
+				P.otherwise(
+					({ name }) => ({
+						type: <const>"file",
+						name,
+					}),
+				),
 			),
 		),
 		A.from,
+		O.to({
+			folders: innerPipe(
+				A.filter(O.discriminate("type", "folder")),
+				A.sort((entry1, entry2) => collator.compare(entry1.name, entry2.name)),
+			),
+			files: innerPipe(
+				A.filter(O.discriminate("type", "file")),
+				A.sort((entry1, entry2) => collator.compare(entry1.name, entry2.name)),
+			),
+		}),
+		({ folders, files }) => ([
+			...folders,
+			...files,
+		]),
+		A.map(O.omit({ type: true })),
 	);
 }
-
