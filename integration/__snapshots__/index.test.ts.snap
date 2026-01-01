@@ -18,24 +18,24 @@ exports[`build rollup 2`] = `
   "name": "@duplojs/test",
   "files": [
     {
-      "name": "index.mjs"
-    },
-    {
-      "name": "index.d.ts"
-    },
-    {
       "name": "mySuperDomain",
       "files": [
         {
-          "name": "mySuperFunction.mjs"
+          "name": "index.d.ts"
         },
         {
           "name": "mySuperFunction.d.ts"
         },
         {
-          "name": "index.d.ts"
+          "name": "mySuperFunction.mjs"
         }
       ]
+    },
+    {
+      "name": "index.d.ts"
+    },
+    {
+      "name": "index.mjs"
     }
   ]
 }"
