@@ -1,6 +1,6 @@
 import { G, A, S, O, pipe } from "@duplojs/utils";
 import type { Plugin } from "rollup";
-import { includer } from "./includer";
+import { resolveIncludes } from "./resolveIncludes";
 
 interface DeclarationIncludesParams {
 	includedPath: string;
@@ -25,7 +25,7 @@ export function declarationIncludesPlugin(
 					async(asset) => {
 						const source = asset.source.toString();
 
-						asset.source = await includer({
+						asset.source = await resolveIncludes({
 							source,
 							includedPath,
 							lineChar,

@@ -1,6 +1,5 @@
-import { A, pipe, S, G } from "@duplojs/utils";
+import { A, pipe, S, G, Path } from "@duplojs/utils";
 import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
 
 export class RecursiveIncludeError extends Error {
 	public constructor(
@@ -10,7 +9,7 @@ export class RecursiveIncludeError extends Error {
 	}
 }
 
-interface IncluderParams {
+interface ResolveIncludesParams {
 	source: string;
 	stack?: string[];
 	includedPath: string;
@@ -19,27 +18,27 @@ interface IncluderParams {
 
 const includePattern = /^(?<indent>.*)\{@include (?<path>[A-z/.]+)(?:\[(?<startLine>[0-9]+),(?<endLine>[0-9]+)\])?\}/gm;
 
-export async function includer(
+export async function resolveIncludes(
 	{
 		source,
 		stack = [],
 		includedPath,
 		lineChar,
-	}: IncluderParams,
+	}: ResolveIncludesParams,
 ): Promise<string> {
 	return pipe(
 		source,
-		S.matchAll(includePattern),
+		S.extractAll(includePattern),
 		G.asyncReduce(
 			G.reduceFrom(source),
 			async({ lastValue, element, next }) => {
-				const { path, startLine, endLine, indent } = element.groups ?? {};
+				const { path, startLine, endLine, indent } = element.namedGroups ?? {};
 
 				if (!path || indent === undefined) {
 					return next(lastValue);
 				}
 
-				const resolvedPath = resolve(includedPath, path);
+				const resolvedPath = Path.resolveRelative([includedPath, path]);
 
 				if (A.includes(stack, resolvedPath)) {
 					throw new RecursiveIncludeError(resolvedPath);
@@ -62,7 +61,7 @@ export async function includer(
 					A.join(lineChar),
 				);
 
-				const expandedContent = await includer({
+				const expandedContent = await resolveIncludes({
 					source: slicedContent,
 					stack: A.push(stack, resolvedPath),
 					includedPath,
@@ -76,7 +75,7 @@ export async function includer(
 					A.join(lineChar),
 					(content) => S.replace(
 						lastValue,
-						A.at(element, 0),
+						element.matchedValue,
 						content,
 					),
 					next,

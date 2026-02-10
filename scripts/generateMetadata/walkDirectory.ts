@@ -1,6 +1,5 @@
-import { A, asyncPipe, P, innerPipe, G, O } from "@duplojs/utils";
+import { A, asyncPipe, P, innerPipe, G, O, Path } from "@duplojs/utils";
 import { opendir } from "node:fs/promises";
-import { join } from "node:path";
 
 export interface FileStructure {
 	name: string;
@@ -27,7 +26,7 @@ export function walkDirectory(
 				P.when(
 					(entry) => entry.isDirectory(),
 					({ name }) => asyncPipe(
-						join(directoryPath, name),
+						Path.resolveRelative([directoryPath, name]),
 						walkDirectory,
 						(files) => ({
 							type: <const>"folder",

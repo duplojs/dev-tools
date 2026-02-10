@@ -1,6 +1,5 @@
-import { asyncPipe, E, unwrap } from "@duplojs/utils";
+import { asyncPipe, E, unwrap, Path } from "@duplojs/utils";
 import { writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import type { Plugin } from "rollup";
 import { walkDirectory } from "./walkDirectory";
 
@@ -33,7 +32,7 @@ export function generateMetadataPlugin(
 				return;
 			}
 
-			const metadataPath = join(directory, metadataFileName);
+			const metadataPath = Path.resolveRelative([directory, metadataFileName]);
 
 			const result = await E.future(
 				asyncPipe(
