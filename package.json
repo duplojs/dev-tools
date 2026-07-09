@@ -65,12 +65,17 @@
     "vitest": "3.2.4"
   },
   "dependencies": {
-    "@duplojs/utils": "1.5.6"
+    "@duplojs/utils": "1.10.3",
+    "@duplojs/server-utils": "0.4.2"
   },
   "workspaces": [
     "integration"
   ],
-  "keywords": [],
+  "keywords": [
+    "metadata-generator",
+    "includer",
+    "duplojs"
+  ],
   "engines": {
     "node": ">=22.15.1"
   }

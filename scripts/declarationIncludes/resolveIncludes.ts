@@ -1,22 +1,37 @@
-import { A, pipe, S, G, Path } from "@duplojs/utils";
-import { readFile } from "node:fs/promises";
+import { A, pipe, S, G, Path, kindClass, E } from "@duplojs/utils";
+import { SF } from "@duplojs/server-utils";
+import { createDeclarationIncludesKind } from "./kind";
 
-export class RecursiveIncludeError extends Error {
+export class RecursiveIncludeError extends kindClass(
+	createDeclarationIncludesKind("recursive-include-error"),
+	Error,
+) {
 	public constructor(
 		public readonly path: string,
 	) {
-		super("Recursive include detected");
+		super({}, `Recursive include detected file: "${path}"`);
 	}
 }
 
-interface ResolveIncludesParams {
+export class IncludeFileReadError extends kindClass(
+	createDeclarationIncludesKind("include-file-read-error"),
+	Error,
+) {
+	public constructor(
+		public readonly path: string,
+		public readonly error: SF.FileSystemLeft<"read-text-file">,
+	) {
+		super({}, `Failed to read included file: "${path}"`);
+	}
+}
+
+const includePattern = /^(?<indent>.*)\{@include (?<path>[A-z/.]+)(?:\[(?<startLine>[0-9]+),(?<endLine>[0-9]+)\])?\}/gm;
+export interface ResolveIncludesParams {
 	source: string;
 	stack?: string[];
 	includedPath: string;
 	lineChar: string;
 }
-
-const includePattern = /^(?<indent>.*)\{@include (?<path>[A-z/.]+)(?:\[(?<startLine>[0-9]+),(?<endLine>[0-9]+)\])?\}/gm;
 
 export async function resolveIncludes(
 	{
@@ -44,9 +59,14 @@ export async function resolveIncludes(
 					throw new RecursiveIncludeError(resolvedPath);
 				}
 
-				const contentFile = await readFile(resolvedPath, "utf-8");
+				const resultReadFile = await SF.readTextFile(resolvedPath);
+
+				if (E.isLeft(resultReadFile)) {
+					throw new IncludeFileReadError(resolvedPath, resultReadFile);
+				}
+
 				const slicedContent = pipe(
-					contentFile,
+					E.unwrapRight(resultReadFile),
 					S.split(lineChar),
 					(lines) => {
 						if (startLine && endLine) {
@@ -76,7 +96,7 @@ export async function resolveIncludes(
 					(content) => S.replace(
 						lastValue,
 						element.matchedValue,
-						content,
+						() => content,
 					),
 					next,
 				);

@@ -3,6 +3,7 @@
 exports[`build rollup 1`] = `
 "/**
  * Super test de la mort qui tue.
+ * je test que le replace avec \`$\` ne bug plus.
  * ------------
  * \`\`\`ts
  * const hardCalc = 1 * 1000;

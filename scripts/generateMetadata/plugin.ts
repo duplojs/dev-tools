@@ -1,14 +1,18 @@
-import { asyncPipe, E, unwrap, Path } from "@duplojs/utils";
-import { writeFile } from "node:fs/promises";
+import { asyncPipe, E, Path, kindClass } from "@duplojs/utils";
+import { SF } from "@duplojs/server-utils";
 import type { Plugin } from "rollup";
-import { walkDirectory } from "./walkDirectory";
+import { getDirectoryFileStructure } from "./getDirectoryFileStructure";
+import { createGenerateMetadataKind } from "./kind";
 
-export class MetadataGenerationError extends Error {
+export class MetadataGenerationError extends kindClass(
+	createGenerateMetadataKind("generated-error"),
+	Error,
+) {
 	public constructor(
-		public readonly metadataPath: string,
-		public readonly catchError: unknown,
+		public readonly path: string,
+		public readonly error: SF.FileSystemLeft<"write-json-file">,
 	) {
-		super("Error during generate metadata file");
+		super({}, "Error during generate metadata file");
 	}
 }
 
@@ -34,23 +38,22 @@ export function generateMetadataPlugin(
 
 			const metadataPath = Path.resolveRelative([directory, metadataFileName]);
 
-			const result = await E.future(
-				asyncPipe(
-					directory,
-					walkDirectory,
-					(files) => ({
-						name: packageName,
-						files,
-					}),
-					(metadata) => writeFile(
-						metadataPath,
-						JSON.stringify(metadata, null, 2),
-					),
+			const result = await asyncPipe(
+				directory,
+				getDirectoryFileStructure,
+				(files) => ({
+					name: packageName,
+					files,
+				}),
+				(metadata) => SF.writeJsonFile(
+					metadataPath,
+					metadata,
+					{ space: 2 },
 				),
 			);
 
 			if (E.isLeft(result)) {
-				throw new MetadataGenerationError(metadataPath, unwrap(result));
+				throw new MetadataGenerationError(metadataPath, result);
 			}
 		},
 	} as const satisfies Plugin;

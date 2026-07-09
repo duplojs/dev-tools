@@ -5,7 +5,6 @@ import { defineConfig } from "rollup";
 
 export default defineConfig({
 	input: [
-		"scripts/index.ts",
 		"scripts/generateMetadata/index.ts",
 		"scripts/declarationIncludes/index.ts",
 	],

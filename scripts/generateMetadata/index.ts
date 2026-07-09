@@ -1,2 +1,3 @@
 export * from "./plugin";
-export * from "./walkDirectory";
+export * from "./getDirectoryFileStructure";
+export * from "./kind";
